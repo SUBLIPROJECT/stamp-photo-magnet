@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <title>FOTO-MAGNES ZNACZEK – Kreator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050a11;
+      --panel:#0b1220;
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,.7);
+      --muted2:rgba(234,240,255,.55);
+      --line:rgba(255,255,255,.10);
+      --green:#00b853;
+      --green2:#00d05f;
+      --danger:#b3261e;
+      --shadow:0 18px 45px rgba(0,0,0,.75);
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; margin:0; background:var(--bg); color:var(--text); font-family:"Manrope","Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+    .app{
+      height:100vh;
+      display:grid;
+      grid-template-columns: 360px 1fr;
+      gap:14px;
+      padding:14px;
+    }
+    .left{
+      background:radial-gradient(circle at top, #182335, var(--panel) 68%);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      min-height:0;
+    }
+    .right{
+      background:radial-gradient(circle at top, #111827, #02040a 70%);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .h1{
+      font-size:15px;
+      font-weight:800;
+      letter-spacing:.3px;
+      color:rgba(255,255,255,.9);
+    }
+    .row{ display:flex; gap:8px; flex-wrap:wrap; }
+    .btn{
+      font-family:"Manrope","Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      border:none;
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      transition:transform .08s, background .15s, box-shadow .15s;
+      box-shadow:0 0 0 rgba(0,0,0,0);
+      user-select:none;
+    }
+    .btn:active{ transform:scale(.98); box-shadow:0 0 0 1px rgba(255,255,255,.14); }
+    .btn.blue{ background:#2563eb; color:#eef3ff; box-shadow:0 6px 18px rgba(37,99,235,.35); }
+.btn.blue:active{ background:#1d4ed8; }
+
+    .btn.green{ background:var(--green); color:#02130a; box-shadow:0 6px 18px rgba(0,184,83,.35); }
+    .btn.green:active{ background:var(--green2); }
+    .btn.danger{ background:var(--danger); color:#fff; }
+    .btn.small{ padding:8px 12px; font-weight:800; }
+    .btn.toggle.active{ background:rgba(255,255,255,.18); }
+    .divider{ height:1px; background:var(--line); margin:2px 0; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{ font-family:"Manrope","Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; font-size:12px; font-weight:800; letter-spacing:.2px; color:var(--muted); }
+    .sliderRow{ display:flex; align-items:center; gap:10px; }
+    input[type="range"]{ width:100%; height:32px; accent-color:var(--green); }
+    .pill{
+      font-family:"Manrope","Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      min-width:78px;
+      display:inline-flex;
+      justify-content:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .pill span{ opacity:.7; font-weight:700; }
+
+    .previewHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .badge{
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:rgba(255,255,255,.85);
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.12);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    .previewBox{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:0;
+    }
+    .stage{
+      width:min(720px, 100%);
+      height:min(720px, 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border-radius:0;
+      position:relative;
+      overflow:visible;
+    }
+    canvas{
+      display:block;
+      background:#000;
+      border-radius:0;
+      touch-action:none;
+      position:relative;
+      z-index:1;
+    }
+    #photoOutline{
+      position:absolute;
+      left:0; top:0;
+      border:2px dashed rgba(255,255,255,.55);
+      outline:1px solid rgba(0,0,0,.35);
+      box-shadow:0 0 0 1px rgba(0,0,0,.25);
+      border-radius:0;
+      pointer-events:none;
+      display:none;
+      z-index:3;
+    }
+
+
+
+
+
+
+
+
+
+    .note{
+      margin-top:auto;
+      font-size:12px;
+      color:var(--muted2);
+      line-height:1.35;
+    }
+
+    @media (max-width: 980px){
+      .app{ grid-template-columns: 1fr; }
+      .left{ order:2; }
+      .right{ order:1; }
+      .stage{ width:min(680px, 100vw - 28px); height:min(680px, 55vh); }
+    }
+  
+    /* === v25: single column + tools under preview (symmetric) === */
+    .left{ display:none !important; }
+    .app{ grid-template-columns: 1fr !important; height:100vh; max-height:100vh; overflow:hidden; }
+
+    html, body{ height:100%; overflow:hidden; }
+
+    .right{
+      align-items:center;
+      height: calc(100vh - 28px);
+      max-height: calc(100vh - 28px);
+      overflow:hidden;
+    }
+
+    .previewBox{
+      width: min(680px, 100vw - 28px);
+      flex: 1 1 auto;
+      min-height: 0;
+      margin: 0 auto;
+    }
+
+    /* Stage stays centered; it will shrink with previewBox height */
+    .stage{
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .toolsBelow{
+      width: min(680px, 100vw - 28px);
+      margin: 12px auto 0;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      flex: 0 0 auto;
+    }
+
+    .toolsRow{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:10px;
+      width:100%;
+    }
+    .toolsRow .btn{ width:100%; justify-content:center; }
+
+    .toolsBelow .field{ width:100%; }
+    .downloadRow .btn{ width:100%; }
+
+    @media (max-width: 560px){
+      .toolsRow{ grid-template-columns: repeat(2, 1fr); }
+    }
+
+
+    /* === v25: slider label style aligned with buttons === */
+    .toolsBelow .field .label{
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .2px;
+      margin-bottom: 8px;
+    }
+
+
+    /* === Kreator_V1: modern UI facelift (CSS only) === */
+    :root{
+      --bg: #0b0f16;
+      --panel: rgba(18, 24, 38, .78);
+      --panel2: rgba(18, 24, 38, .62);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --muted2: rgba(255,255,255,.55);
+      --shadow: 0 18px 55px rgba(0,0,0,.60);
+      --shadow2: 0 10px 30px rgba(0,0,0,.35);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --accent: #3B82F6;
+      --accent2:#22C55E;
+      --danger:#EF4444;
+    }
+
+    /* Background */
+    body{
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(59,130,246,.22), transparent 55%),
+        radial-gradient(900px 520px at 100% 10%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(900px 520px at 50% 120%, rgba(168,85,247,.16), transparent 55%),
+        var(--bg) !important;
+    }
+
+    /* App container */
+    .app{
+      gap:16px !important;
+      padding:16px !important;
+    }
+
+    .right{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)) !important;
+      border: 1px solid var(--stroke2) !important;
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 16px !important;
+    }
+
+    /* Preview area */
+    .previewBox{
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow2);
+      padding: 12px;
+    }
+
+    .stage{
+      border-radius: var(--radius-md);
+    }
+
+    /* Tools container */
+    .toolsBelow{
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Buttons */
+    .btn{
+      border-radius: 999px !important;
+      border: 1px solid rgba(255,255,255,.12) !important;
+      background: rgba(255,255,255,.05) !important;
+      color: var(--text) !important;
+      font-weight: 650 !important;
+      letter-spacing: .2px;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    }
+    .btn:hover{
+      background: rgba(255,255,255,.075) !important;
+      border-color: rgba(255,255,255,.18) !important;
+      box-shadow: 0 10px 22px rgba(0,0,0,.32);
+      transform: translateY(-1px);
+    }
+    .btn:active{
+      transform: translateY(0px) scale(.99);
+    }
+    .btn:focus-visible{
+      outline: 2px solid rgba(59,130,246,.55);
+      outline-offset: 2px;
+    }
+
+    /* Toggles */
+    .btn.toggle.active{
+      background: rgba(59,130,246,.22) !important;
+      border-color: rgba(59,130,246,.40) !important;
+      box-shadow: 0 10px 24px rgba(59,130,246,.18);
+    }
+
+    /* Primary / danger */
+    .btn.green{
+      background: rgba(34,197,94,.18) !important;
+      border-color: rgba(34,197,94,.38) !important;
+    }
+    .btn.green:hover{ background: rgba(34,197,94,.24) !important; }
+
+    .btn.danger{
+      background: rgba(239,68,68,.16) !important;
+      border-color: rgba(239,68,68,.34) !important;
+    }
+    .btn.danger:hover{ background: rgba(239,68,68,.22) !important; }
+
+    /* Download button = more prominent */
+    .downloadRow .btn{
+      background: linear-gradient(180deg, rgba(59,130,246,.88), rgba(59,130,246,.74)) !important;
+      border-color: rgba(255,255,255,.20) !important;
+      box-shadow: 0 14px 28px rgba(59,130,246,.22);
+    }
+    .downloadRow .btn:hover{
+      box-shadow: 0 18px 36px rgba(59,130,246,.28);
+    }
+
+    /* Slider */
+    .toolsBelow .field{
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius-md);
+      padding: 12px 12px 10px;
+    }
+    .toolsBelow .field .label{
+      color: var(--muted) !important;
+    }
+
+    input[type="range"]{
+      accent-color: var(--accent);
+    }
+    /* WebKit track/thumb */
+    input[type="range"]::-webkit-slider-runnable-track{
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      margin-top: -6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.25);
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+    /* Firefox */
+    input[type="range"]::-moz-range-track{
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.25);
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+
+    /* Value pill */
+    .pill{
+      background: rgba(255,255,255,.08) !important;
+      border: 1px solid rgba(255,255,255,.12) !important;
+      color: rgba(255,255,255,.85) !important;
+    }
+
+
+    /* === Kreator_V2: buttons without blur === */
+    .btn{
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      filter: none !important;
+    }
+
+
+    /* === Kreator_V3: clean premium (flat + soft depth) === */
+    :root{
+      --bg: #0e1117;
+      --panel: #121826;
+      --panel-soft: #161c2e;
+      --stroke: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent: #4f8cff;
+      --accent-strong:#2563eb;
+      --danger:#ef4444;
+      --shadow-soft: 0 10px 28px rgba(0,0,0,.35);
+    }
+
+    body{
+      background: linear-gradient(180deg, #0b1020, #0e1117 40%, #0e1117) !important;
+    }
+
+    .right{
+      background: var(--panel) !important;
+      border: 1px solid var(--stroke) !important;
+      box-shadow: var(--shadow-soft) !important;
+      backdrop-filter: none !important;
+    }
+
+    .previewBox{
+      background: #0b1020;
+      border: 1px solid var(--stroke);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+
+    .toolsBelow{
+      background: var(--panel-soft);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Buttons – flat, modern */
+    .btn{
+      background: #1b2238 !important;
+      border: 1px solid rgba(255,255,255,.10) !important;
+      box-shadow: none !important;
+      font-weight: 600;
+    }
+    .btn:hover{
+      background: #232c4a !important;
+      border-color: rgba(255,255,255,.18) !important;
+      transform: none !important;
+    }
+
+    .btn.toggle.active{
+      background: var(--accent) !important;
+      border-color: var(--accent-strong) !important;
+      color: #fff !important;
+    }
+
+    .btn.green{
+      background: #14532d !important;
+      border-color: #22c55e !important;
+    }
+
+    .btn.danger{
+      background: #3a1212 !important;
+      border-color: var(--danger) !important;
+    }
+
+    .downloadRow .btn{
+      background: linear-gradient(180deg, var(--accent), var(--accent-strong)) !important;
+      border-color: rgba(255,255,255,.18) !important;
+    }
+
+    /* Slider */
+    .toolsBelow .field{
+      background: #0e1424;
+      border: 1px solid var(--stroke);
+    }
+
+    input[type="range"]{
+      accent-color: var(--accent);
+    }
+
+
+    /* === Kreator_V4: mobile responsive (CSS only, no logic changes) === */
+
+    /* Allow vertical scrolling on small screens; keep desktop behavior */
+    @media (max-width: 820px){
+      html, body{ height:auto !important; overflow:auto !important; }
+      body{ -webkit-text-size-adjust: 100%; }
+
+      .app{
+        height:auto !important;
+        max-height:none !important;
+        overflow:visible !important;
+        padding:12px !important;
+        gap:12px !important;
+      }
+
+      .right{
+        height:auto !important;
+        max-height:none !important;
+        overflow:visible !important;
+        padding:12px !important;
+        border-radius: 18px !important;
+      }
+
+      /* Make preview and tools use full width */
+      .previewBox,
+      .toolsBelow{
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+
+      /* Keep preview visible without forcing horizontal scroll */
+      .previewBox{
+        padding:10px !important;
+      }
+      .stage{
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        aspect-ratio: 1 / 1;
+      }
+      /* Canvas scales inside stage via existing JS; ensure it can shrink */
+      #canvas{ max-width: 100%; height: auto; }
+
+      /* Tools layout: 2 columns on phones, 4 on tablets */
+      .toolsRow{
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap:10px !important;
+      }
+      @media (min-width: 520px){
+        .toolsRow{ grid-template-columns: repeat(4, 1fr) !important; }
+      }
+
+      /* Buttons a bit taller for touch */
+      .btn{
+        min-height: 44px;
+        font-size: 14px;
+      }
+
+      /* Slider spacing */
+      .toolsBelow .field{
+        padding: 12px !important;
+      }
+
+      /* Keep download button comfortably tappable */
+      .downloadRow .btn{
+        min-height: 48px;
+      }
+    }
+
+    /* Very small phones */
+    @media (max-width: 380px){
+      .app{ padding:10px !important; }
+      .btn{ font-size: 13px; }
+      .toolsRow{ gap:8px !important; }
+    }
+
+
+/* === Kreator_V20: mobile pinch/drag stable === */
+#canvas{ touch-action:none; }
+
+    /* === Kreator_V24: send files info === */
+    .sendInfo{
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.85;
+      text-align: center;
+    }
+
+
+    /* === Equal preview size on desktop (no layout growth on portrait) === */
+    @media (min-width: 821px){
+      .stage{
+        width: min(720px, 100%);
+        height: min(720px, 100%);
+        aspect-ratio: auto;
+        overflow: hidden;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      }
+    }
+
+
+    /* === Kreator_V27: mobile no-page-scroll (fit everything in viewport) === */
+    @media (max-width: 820px){
+      html, body{
+        height: 100%;
+        overflow: hidden !important;          /* disable page scrolling */
+        overscroll-behavior: none;            /* disable rubber-band where supported */
+      }
+      body{
+        position: fixed;                      /* prevent iOS scroll bounce */
+        width: 100%;
+      }
+
+      .app{
+        height: 100dvh !important;            /* dynamic viewport height (mobile) */
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        padding: 10px !important;
+        gap: 10px !important;
+      }
+
+      .right{
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+        padding: 10px !important;
+      }
+
+      /* Tighten vertical spacing so everything fits */
+      .previewBox{ padding: 8px !important; }
+      .toolsBelow{ padding: 10px !important; }
+      .toolsBelow .field{ padding: 10px !important; }
+
+      .btn{ min-height: 42px; }
+      .downloadRow .btn{ min-height: 46px; }
+
+      /* Make preview stage adapt to remaining space without forcing scroll */
+      .stage{
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;                 /* stable on mobile */
+      }
+      #canvas{
+        max-width: 100% !important;
+        height: auto !important;
+      }
+    }
+
+
+    /* === Kreator_V28: desktop helper outline not clipped === */
+    @media (min-width: 821px){
+      /* Allow helper outline to be visible even when it goes beyond the work area */
+      .previewBox{ overflow: visible !important; }
+      .stage{ overflow: visible !important; }
+    }
+
+
+    /* === Kreator_V31: desktop auto-fit preview + scroll fallback === */
+    @media (min-width: 821px){
+      html, body{
+        height: 100%;
+        overflow: hidden; /* keep layout stable; scrolling happens in the right panel */
+      }
+      .app{
+        height: 100vh;
+        overflow: hidden;
+      }
+      .right{
+        height: 100vh;
+        overflow-y: auto;              /* fallback scroll if screen is short */
+        overscroll-behavior: contain;
+      }
+    }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="left" aria-hidden="true"></div>
+
+    <div class="right">
+      <div class="previewHeader">
+        
+</div>
+
+      <div class="previewBox">
+        <div class="stage" id="stage">
+          <div id="photoOutline" aria-hidden="true"></div>
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+
+      
+      
+      <div class="toolsBelow" aria-label="Narzędzia">
+        <div class="field">
+                <div class="label">Image size</div>
+        <div class="sliderRow">
+          <input id="photoRange" type="range" min="10" max="300" value="100">
+          <div class="pill"><strong id="photoVal">100</strong><span>%</span></div>
+        </div>
+        <div class="toolsRow">
+          <button class="btn small toggle active" id="btnLandscape">Landscape</button>
+          <button class="btn small toggle" id="btnPortrait">Portrait</button>
+          <button class="btn green" id="btnUpload">Upload image</button>
+          <button class="btn danger" id="btnReset">Reset</button>
+        </div>
+        <div class="downloadRow">
+          <button class="btn blue" id="btnDownload">Download for print</button>
+        </div>
+        <div class="sendInfo">
+          Send downloaded files to: <strong>subliproject@gmail.com</strong>
+        </div>
+
+      </div>
+
+
+  <input id="fileInput" type="file" accept="image/*" style="display:none" />
+
+  <script>
+    // ===== PODMIEŃ NA SWOJE PLIKI NA SERWERZE (w tym samym folderze co HTML) =====
+    // Najprościej: wrzuć obok tego HTML pliki o nazwach:
+    // PASER_POZIOM.png i PASER_PION.png
+    const TEMPLATE_LANDSCAPE_SRC = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABE8AAAM8CAYAAACms472AAAACXBIWXMAAC4jAAAuIwF4pT92AAAKZGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuNzhiNzYzOCwgMjAyNS8wMi8xMS0xOToxMDowOCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAxLTI0VDEyOjIxOjE5KzAxOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDI1LTEyLTEyVDExOjI3OjE1KzAxOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNS0xMi0xMlQxMToyNzoxNSswMTowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6ZDUyMjNhODktMmNmZC0zMjRlLThiMTMtNTQwN2M0NjVlZmY5IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6MGUzYjA0NmMtNzNiNS04ZDRhLWJkNDMtM2ZkNjY0MGRjMjBhIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NUU3NTA1QTU5QjNFRUExMTk4QjNDOTU3QjQ0MzBFRkIiIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6WVJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiIGV4aWY6Q29sb3JTcGFjZT0iNjU1MzUiIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSIxMTAzIiBleGlmOlBpeGVsWURpbWVuc2lvbj0iODI4Ij4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo1RTc1MDVBNTlCM0VFQTExOThCM0M5NTdCNDQzMEVGQiIgc3RFdnQ6d2hlbj0iMjAyMC0wMS0yNFQxMjoyMToxOSswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjk5MEY2REIzOUMzRUVBMTE5OEIzQzk1N0I0NDMwRUZCIiBzdEV2dDp3aGVuPSIyMDIwLTAxLTI0VDEyOjI5OjAyKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZGM4MjMyNTAtY2Y3MS1iNzQyLTk0OTUtYzU1NTcyY2ZmYmI5IiBzdEV2dDp3aGVuPSIyMDI1LTEyLTEyVDExOjI3OjE1KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjYuNSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iZGVyaXZlZCIgc3RFdnQ6cGFyYW1ldGVycz0iY29udmVydGVkIGZyb20gYXBwbGljYXRpb24vdm5kLmFkb2JlLnBob3Rvc2hvcCB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmQ1MjIzYTg5LTJjZmQtMzI0ZS04YjEzLTU0MDdjNDY1ZWZmOSIgc3RFdnQ6d2hlbj0iMjAyNS0xMi0xMlQxMToyNzoxNSswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI2LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpkYzgyMzI1MC1jZjcxLWI3NDItOTQ5NS1jNTU1NzJjZmZiYjkiIHN0UmVmOmRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDpjY2ZjOTA1ZC1kMTZmLTI2NDgtOGZmMS1lZTRiZjFkOTZjZmEiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1RTc1MDVBNTlCM0VFQTExOThCM0M5NTdCNDQzMEVGQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0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IJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAAAEAQTwAAAACCeAIAAAAQxBMAAACAIJ4AAAAABPEEAAAAIIgnAAAAAEE8AQAAAAjiCQAA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";
+    const TEMPLATE_PORTRAIT_SRC  = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAzwAAARPCAYAAADa5+QPAAAACXBIWXMAAC4jAAAuIwF4pT92AAAKZGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgOS4xLWMwMDIgNzkuNzhiNzYzOCwgMjAyNS8wMi8xMS0xOToxMDowOCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdEV2dD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlRXZlbnQjIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTAxLTI0VDEyOjIxOjE5KzAxOjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDI1LTEyLTEyVDExOjI2OjQ0KzAxOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyNS0xMi0xMlQxMToyNjo0NCswMTowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6M2VjNWQxYzYtOTc0My0xODRmLThiNTQtZjE3Y2UwMWVmODU1IiB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6M2M5YzE5MjEtMTU2YS00MjQxLTliMjQtMWY0MjUyN2E1MGNhIiB4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6NUU3NTA1QTU5QjNFRUExMTk4QjNDOTU3QjQ0MzBFRkIiIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6WVJlc29sdXRpb249IjMwMDAwMDAvMTAwMDAiIHRpZmY6UmVzb2x1dGlvblVuaXQ9IjIiIGV4aWY6Q29sb3JTcGFjZT0iNjU1MzUiIGV4aWY6UGl4ZWxYRGltZW5zaW9uPSI4MjgiIGV4aWY6UGl4ZWxZRGltZW5zaW9uPSIxMTAzIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo1RTc1MDVBNTlCM0VFQTExOThCM0M5NTdCNDQzMEVGQiIgc3RFdnQ6d2hlbj0iMjAyMC0wMS0yNFQxMjoyMToxOSswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjk5MEY2REIzOUMzRUVBMTE5OEIzQzk1N0I0NDMwRUZCIiBzdEV2dDp3aGVuPSIyMDIwLTAxLTI0VDEyOjI5OjAyKzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZmNlMjYyOGYtNjc0Ni0yMTQ1LThiMjItNTk0N2RjMTc3YTEyIiBzdEV2dDp3aGVuPSIyMDI1LTEyLTEyVDExOjI2OjQ0KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgMjYuNSAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iZGVyaXZlZCIgc3RFdnQ6cGFyYW1ldGVycz0iY29udmVydGVkIGZyb20gYXBwbGljYXRpb24vdm5kLmFkb2JlLnBob3Rvc2hvcCB0byBpbWFnZS9wbmciLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjNlYzVkMWM2LTk3NDMtMTg0Zi04YjU0LWYxN2NlMDFlZjg1NSIgc3RFdnQ6d2hlbj0iMjAyNS0xMi0xMlQxMToyNjo0NCswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDI2LjUgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpmY2UyNjI4Zi02NzQ2LTIxNDUtOGIyMi01OTQ3ZGMxNzdhMTIiIHN0UmVmOmRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDpjNjZmMTk2Ny0yZDQ1LWM4NDEtYWMzYy1iYTM0ZWFjMDMwYWIiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1RTc1MDVBNTlCM0VFQTExOThCM0M5NTdCNDQzMEVGQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0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QJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAgS/AAAABZggcAAMgSPAAAQJbgAQAAsgQPAACQJXgAAIAswQMAAGQJHgAAIEvwAAAAWYIHAADIEjwAAECW4AEAALIEDwAAkCV4AACALMEDAABkCR4AACBL8AAAAFmCBwAAyBI8AABAluABAACyBA8AAJAleAAAgCzBAwAAZAkeAAAg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";
+
+    const el = (id)=>document.getElementById(id);
+
+    const canvas = el("canvas");
+    const ctx = canvas.getContext("2d");
+    const stage = el("stage");
+    const photoOutline = el("photoOutline");
+    const badgeInfo = el("badgeInfo");
+
+    const btnLandscape = el("btnLandscape");
+    const btnPortrait  = el("btnPortrait");
+    const btnUpload    = el("btnUpload");
+    const btnReset     = el("btnReset");
+    const btnDownload  = el("btnDownload");
+    const fileInput    = el("fileInput");
+
+    const photoRange = el("photoRange");
+    const photoVal   = el("photoVal");
+
+    const state = {
+      orientation: "landscape",
+      template: { landscape:null, portrait:null },
+      photo: { img:null, x:0, y:0, scale:1 },
+      interacting:false,
+      interactTimer:null,
+      idle:true,
+      dragging:false,
+      lastX:0,
+      lastY:0
+    };
+
+    let touchInUse = false; // prevents double-handling on mobile
+
+
+    function loadImage(src){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        img.onload = ()=>resolve(img);
+        img.onerror = ()=>reject(new Error("Nie można wczytać: "+src));
+        img.src = src;
+      });
+    }
+
+    function activeTemplate(){
+      return state.orientation==="landscape" ? state.template.landscape : state.template.portrait;
+    }
+
+    function setOrientation(o){
+      state.orientation = o;
+      btnLandscape.classList.toggle("active", o==="landscape");
+      btnPortrait.classList.toggle("active", o==="portrait");
+      const t = activeTemplate();
+      fitCanvasToTemplate();
+      draw();
+      
+      adjustDesktopStage();
+if (typeof updatePhotoOutline === "function") updatePhotoOutline();
+    }
+
+    function fitCanvasToTemplate(){
+      const t = activeTemplate();
+      if (!t) return;
+
+      canvas.width = t.width;
+      canvas.height = t.height;
+
+      const boxW = stage.clientWidth;
+      const boxH = stage.clientHeight;
+      // Keep preview scale consistent between landscape and portrait on desktop.
+      // Use LANDSCAPE template as reference so switching to portrait does not enlarge the preview.
+      const refW = 1103;
+      const refH = 828;
+      const scale = Math.min(boxW / refW, boxH / refH);
+
+      canvas.style.width  = Math.floor(canvas.width * scale) + "px";
+      canvas.style.height = Math.floor(canvas.height * scale) + "px";
+    }
+
+    // aktualizuj ramkę po zmianie rozmiaru podglądu
+    if (typeof updatePhotoOutline === "function") updatePhotoOutline();
+
+    function startInteract(){
+      state.interacting = true;
+      state.idle = false;
+      if (state.interactTimer) clearTimeout(state.interactTimer);
+      state.interactTimer = setTimeout(()=>{ state.interacting = false; state.idle = true; draw(); }, 300);
+    }
+    function endInteract(){
+      state.interacting = false;
+      if (state.interactTimer) { clearTimeout(state.interactTimer); state.interactTimer = null; }
+    }
+
+    function resetPhotoTransform(){
+      state.photo.x = 0;
+      state.photo.y = 0;
+      state.photo.scale = 1;
+      photoRange.value = 100;
+      photoVal.textContent = 100;
+    }
+    function updatePhotoOutline(){
+      if (!state.photo.img){
+        photoOutline.style.display = "none";
+        return;
+      }
+      const rect = canvas.getBoundingClientRect();
+      const w = canvas.width, h = canvas.height;
+      const iw = state.photo.img.width;
+      const ih = state.photo.img.height;
+      const cover = Math.max(w/iw, h/ih);
+      const dw = iw * cover;
+      const dh = ih * cover;
+      const cx = w/2 + state.photo.x;
+      const cy = h/2 + state.photo.y;
+      const sw = dw * state.photo.scale;
+      const sh = dh * state.photo.scale;
+      const x = cx - sw/2;
+      const y = cy - sh/2;
+      // canvas -> CSS px
+      const sx = rect.width / w;
+      const sy = rect.height / h;
+      const left = rect.left + x * sx;
+      const top  = rect.top  + y * sy;
+      const width = sw * sx;
+      const height = sh * sy;
+      // stage coords
+      const stageRect = stage.getBoundingClientRect();
+      photoOutline.style.display = "block";
+      photoOutline.style.borderColor = state.idle
+        ? "rgba(255,255,255,.25)"
+        : "rgba(255,255,255,.65)";
+      photoOutline.style.left = (left - stageRect.left) + "px";
+      photoOutline.style.top  = (top - stageRect.top) + "px";
+      photoOutline.style.width = width + "px";
+      photoOutline.style.height = height + "px";
+    }
+
+    function draw(){
+      const t = activeTemplate();
+      if (!t){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        return;
+      }
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+
+      if (state.photo.img){
+        ctx.save();
+        const w = canvas.width, h = canvas.height;
+        ctx.translate(w/2 + state.photo.x, h/2 + state.photo.y);
+        ctx.scale(state.photo.scale, state.photo.scale);
+
+        const iw = state.photo.img.width;
+        const ih = state.photo.img.height;
+
+        const cover = Math.max(w/iw, h/ih);
+        const dw = iw * cover;
+        const dh = ih * cover;
+
+        ctx.drawImage(state.photo.img, -dw/2, -dh/2, dw, dh);
+        ctx.restore();
+      }
+
+      ctx.drawImage(t, 0, 0, canvas.width, canvas.height);
+
+      updatePhotoOutline();
+    }
+
+    btnLandscape.addEventListener("click", ()=>setOrientation("landscape"));
+    btnPortrait.addEventListener("click", ()=>setOrientation("portrait"));
+
+    btnUpload.addEventListener("click", ()=>fileInput.click());
+    fileInput.addEventListener("change", (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          state.photo.img = img;
+          resetPhotoTransform();
+          draw();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = "";
+    });
+
+    btnReset.addEventListener("click", ()=>{
+      state.photo.img = null;
+      resetPhotoTransform();
+      draw();
+    });
+
+    photoRange.addEventListener("input", ()=>{
+      const p = parseInt(photoRange.value,10);
+      photoVal.textContent = p;
+      state.photo.scale = p/100;
+      startInteract();
+      draw();
+    });
+
+    btnDownload.addEventListener("click", ()=>{
+      const t = activeTemplate();
+      if (!t) return;
+
+      const out = document.createElement("canvas");
+      out.width = t.width;
+      out.height = t.height;
+      const octx = out.getContext("2d");
+
+      octx.fillStyle = "#fff";
+      octx.fillRect(0,0,out.width,out.height);
+
+      if (state.photo.img){
+        octx.save();
+        octx.translate(out.width/2 + state.photo.x, out.height/2 + state.photo.y);
+        octx.scale(state.photo.scale, state.photo.scale);
+        const iw = state.photo.img.width;
+        const ih = state.photo.img.height;
+        const cover = Math.max(out.width/iw, out.height/ih);
+        const dw = iw * cover;
+        const dh = ih * cover;
+        octx.drawImage(state.photo.img, -dw/2, -dh/2, dw, dh);
+        octx.restore();
+      }
+
+      octx.drawImage(t, 0, 0, out.width, out.height);
+
+      const a = document.createElement("a");
+      const key = "magnes_counter";
+      const n = (parseInt(localStorage.getItem(key) || "0", 10) + 1);
+      localStorage.setItem(key, String(n));
+      const fileNum = String(n).padStart(3, "0");
+      a.download = `Magnes_${fileNum}.jpg`;
+      a.href = out.toDataURL("image/png");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    
+    canvas.addEventListener("pointerdown", (e)=>{
+      if (touchInUse || (e && e.pointerType === "touch")) return;
+      if (!state.photo.img) return;
+      canvas.setPointerCapture(e.pointerId);
+      state.dragging = true;
+      startInteract();
+      state.lastX = e.clientX;
+      state.lastY = e.clientY;
+    });
+
+    canvas.addEventListener("pointermove", (e)=>{
+      if (touchInUse || (e && e.pointerType === "touch")) return;
+      if (!state.dragging || !state.photo.img) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+
+      const dx = (e.clientX - state.lastX) * scaleX;
+      const dy = (e.clientY - state.lastY) * scaleY;
+
+      state.lastX = e.clientX;
+      state.lastY = e.clientY;
+
+      state.photo.x += dx;
+      state.photo.y += dy;
+      draw();
+    });
+
+    window.addEventListener("pointerup", (e)=>{
+      if (touchInUse || (e && e.pointerType === "touch")) return;
+      if (!state.dragging) return;
+      state.dragging = false;
+      endInteract();
+      draw();
+    });
+
+    
+
+    // === Touch drag + pinch (mobile) ===
+    // Uses touch events for iOS/Android; pointer handlers are disabled while touch is active.
+    let pinchActive = false;
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let pinchAnchorX = 0; // canvas coords
+    let pinchAnchorY = 0; // canvas coords
+    let pinchStartPhotoX = 0;
+    let pinchStartPhotoY = 0;
+
+    let touchDragActive = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+    function touchDist(t1, t2){
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.hypot(dx, dy);
+    }
+    function touchMid(t1, t2){
+      return { x: (t1.clientX + t2.clientX)/2, y: (t1.clientY + t2.clientY)/2 };
+    }
+    function clientToCanvas(cx, cy){
+      const rect = canvas.getBoundingClientRect();
+      const x = (cx - rect.left) * (canvas.width / rect.width);
+      const y = (cy - rect.top)  * (canvas.height / rect.height);
+      return { x, y };
+    }
+    function setScaleAndSync(newScale){
+      state.photo.scale = clamp(newScale, 0.1, 3.0);
+      const p = Math.round(state.photo.scale * 100);
+      photoRange.value = p;
+      photoVal.textContent = p;
+    }
+
+    canvas.addEventListener("touchstart", (e)=>{
+      if (!state.photo.img) return;
+      touchInUse = true;
+
+      if (e.touches.length === 2){
+        const d = touchDist(e.touches[0], e.touches[1]);
+        const mid = touchMid(e.touches[0], e.touches[1]);
+        const midC = clientToCanvas(mid.x, mid.y);
+
+        pinchActive = true;
+        touchDragActive = false;
+
+        pinchStartDist = d;
+        pinchStartScale = state.photo.scale;
+
+        pinchAnchorX = midC.x;
+        pinchAnchorY = midC.y;
+
+        pinchStartPhotoX = state.photo.x;
+        pinchStartPhotoY = state.photo.y;
+
+        startInteract();
+        e.preventDefault();
+        return;
+      }
+
+      if (e.touches.length === 1){
+        pinchActive = false;
+        touchDragActive = true;
+
+        lastTouchX = e.touches[0].clientX;
+        lastTouchY = e.touches[0].clientY;
+
+        startInteract();
+        e.preventDefault();
+      }
+    }, { passive:false });
+
+    canvas.addEventListener("touchmove", (e)=>{
+      if (!state.photo.img) return;
+
+      if (e.touches.length === 2){
+        if (!pinchActive){
+          const d0 = touchDist(e.touches[0], e.touches[1]);
+          const mid0 = touchMid(e.touches[0], e.touches[1]);
+          const midC0 = clientToCanvas(mid0.x, mid0.y);
+
+          pinchActive = true;
+          touchDragActive = false;
+
+          pinchStartDist = d0;
+          pinchStartScale = state.photo.scale;
+          pinchAnchorX = midC0.x;
+          pinchAnchorY = midC0.y;
+
+          pinchStartPhotoX = state.photo.x;
+          pinchStartPhotoY = state.photo.y;
+        }
+
+        const d = touchDist(e.touches[0], e.touches[1]);
+        if (pinchStartDist > 0){
+          const ratio = d / pinchStartDist;
+          const targetScale = clamp(pinchStartScale * ratio, 0.1, 3.0);
+
+          // Anchor-stable zoom (draw uses translate(W/2 + x, H/2 + y) then scale)
+          const Cx = canvas.width / 2;
+          const Cy = canvas.height / 2;
+
+          const s0 = pinchStartScale;
+          const s1 = targetScale;
+          const Px = pinchAnchorX;
+          const Py = pinchAnchorY;
+          const o0x = pinchStartPhotoX;
+          const o0y = pinchStartPhotoY;
+
+          const o1x = (Px - Cx) - (s1 / s0) * (Px - Cx - o0x);
+          const o1y = (Py - Cy) - (s1 / s0) * (Py - Cy - o0y);
+
+          state.photo.x = o1x;
+          state.photo.y = o1y;
+          setScaleAndSync(s1);
+          draw();
+        }
+
+        e.preventDefault();
+        return;
+      }
+
+      if (touchDragActive && e.touches.length === 1 && !pinchActive){
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        const cx = e.touches[0].clientX;
+        const cy = e.touches[0].clientY;
+
+        // Consistent feel across zoom levels
+        const sensitivity = 0.25;
+        const currentScale = clamp(state.photo.scale, 0.6, 3.0);
+        const panFactor = sensitivity / currentScale;
+
+        const dx = (cx - lastTouchX) * scaleX * panFactor;
+        const dy = (cy - lastTouchY) * scaleY * panFactor;
+
+        lastTouchX = cx;
+        lastTouchY = cy;
+
+        state.photo.x += dx;
+        state.photo.y += dy;
+
+        draw();
+        e.preventDefault();
+      }
+    }, { passive:false });
+
+    function endTouchInteraction(){
+      pinchActive = false;
+      touchDragActive = false;
+      pinchStartDist = 0;
+      endInteract();
+      draw();
+      // small delay so pointer events emitted right after touch don't interfere
+      setTimeout(()=>{ touchInUse = false; }, 80);
+    }
+
+    canvas.addEventListener("touchend", (e)=>{
+      if (e.touches.length === 0) endTouchInteraction();
+      // if 1 finger remains after pinch, wait for new touchstart to avoid jumps
+      if (e.touches.length === 1){
+        pinchActive = false;
+        touchDragActive = false;
+        pinchStartDist = 0;
+        endInteract();
+        setTimeout(()=>{ touchInUse = false; }, 80);
+      }
+    }, { passive:false });
+
+    canvas.addEventListener("touchcancel", ()=>{
+      endTouchInteraction();
+    }, { passive:false });
+
+canvas.addEventListener("wheel", (e)=>{
+      if (!state.photo.img) return;
+      e.preventDefault();
+      const dir = e.deltaY < 0 ? 1.06 : 0.94;
+      state.photo.scale *= dir;
+      state.photo.scale = Math.max(0.1, Math.min(3.0, state.photo.scale));
+      const p = Math.round(state.photo.scale * 100);
+      photoRange.value = p;
+      photoVal.textContent = p;
+      startInteract();
+      draw();
+    }, { passive:false });
+
+    Promise.all([
+      loadImage(TEMPLATE_LANDSCAPE_SRC).catch(()=>null),
+      loadImage(TEMPLATE_PORTRAIT_SRC).catch(()=>null)
+    ]).then(([land, port])=>{
+      state.template.landscape = land;
+      state.template.portrait  = port || land;
+      if (!state.template.landscape) {
+        badgeInfo.textContent = "BŁĄD: brak szablonu";
+        canvas.width = 1200; canvas.height = 800;
+        canvas.style.width = "600px"; canvas.style.height = "400px";
+        return;
+      }
+      setOrientation("landscape");
+    });
+
+    window.addEventListener("resize", ()=>{
+      fitCanvasToTemplate();
+      draw();
+    });
+  
+    // === Kreator_V31: auto-fit preview size on desktop (no clipping) ===
+    function adjustDesktopStage(){
+      const isDesktop = window.matchMedia("(min-width: 821px)").matches;
+      const stage = document.querySelector(".stage");
+      const right = document.querySelector(".right");
+      const tools = document.querySelector(".toolsBelow");
+      const previewBox = document.querySelector(".previewBox");
+      if (!stage || !right) return;
+
+      if (!isDesktop){
+        // clear inline sizing
+        stage.style.width = "";
+        stage.style.height = "";
+        return;
+      }
+
+      const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+
+      const toolsH = tools ? tools.getBoundingClientRect().height : 0;
+
+      // Include paddings/margins so the stage truly fits without clipping
+      const rightCS = getComputedStyle(right);
+      const rightPad = (parseFloat(rightCS.paddingTop)||0) + (parseFloat(rightCS.paddingBottom)||0);
+
+      const previewCS = previewBox ? getComputedStyle(previewBox) : null;
+      const previewPad = previewCS ? (parseFloat(previewCS.paddingTop)||0) + (parseFloat(previewCS.paddingBottom)||0) : 0;
+
+      // Small safety buffer for fonts/rounding differences across laptops/zoom levels
+      const buffer = 24;
+
+      // Available height for the square stage inside the right panel
+      const available = Math.max(0, vh - rightPad - previewPad - toolsH - buffer);
+
+      // Keep the same "normal" size when there is room, shrink only when needed
+      const size = Math.max(320, Math.min(720, Math.floor(available)));
+
+      stage.style.width = size + "px";
+      stage.style.height = size + "px";
+    }
+
+    window.addEventListener("resize", adjustDesktopStage);
+    window.addEventListener("orientationchange", adjustDesktopStage);
+
+</script>
+</body>
+</html>
